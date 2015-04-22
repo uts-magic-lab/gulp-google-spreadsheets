@@ -1,6 +1,6 @@
 {
   "name": "gulp-google-spreadsheets",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Gulp module to load files from Google Spreadsheets",
   "repository": "https://github.com/uts-magic-lab/gulp-google-spreadsheets.git",
   "main": "index.js",

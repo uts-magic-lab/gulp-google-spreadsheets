@@ -1,7 +1,7 @@
-debug = require('debug')('gulp-spreadsheet')
+debug = require('debug')('gulp-spreadsheets')
 es = require('event-stream')
 File = require('vinyl')
-GoogleSpreadsheet = require("google-spreadsheet")
+GoogleSpreadsheet = require('google-spreadsheet')
 
 dashify = (title)->
     title.replace(/\W+/g, '-').toLowerCase()
@@ -10,13 +10,13 @@ module.exports = (spreadsheetId)->
     stream = new es.Stream()
 
     spreadsheet = new GoogleSpreadsheet(spreadsheetId)
-    debug('getting info for spreadsheet %s', spreadsheetId)
-    spreadsheet.getInfo((err, info)->
+    spreadsheet.getInfo((err, info={})->
+        debug('loaded info for spreadsheet %s', spreadsheetId)
         if err then return stream.emit('error', err)
 
         for worksheet in info.worksheets or []
             file = new File({
-                path: dashify(worksheet.title) + '.html'
+                path: dashify(worksheet.title) + '.json'
                 contents: new Buffer('')
             })
             file.worksheet = worksheet
@@ -25,11 +25,12 @@ module.exports = (spreadsheetId)->
     )
 
     fetchRows = (file, callback)->
-        debug('getting rows for worksheet %s', file.worksheet.id)
-        spreadsheet.getRows(file.worksheet.id, (err, rows)->
+        spreadsheet.getRows(file.worksheet.id, (err, rows=[])->
+            debug('loaded worksheet "%s": %d rows', file.worksheet.title, rows.length)
             if err then return callback(err)
 
-            file.rows = rows
+            file.worksheet.rows = rows
+            file.contents = new Buffer(JSON.stringify(file.worksheet, null, '  '))
             callback(null, file)
         )
 
