@@ -29,6 +29,10 @@ module.exports = (spreadsheetId)->
             debug('loaded worksheet "%s": %d rows', file.worksheet.title, rows.length)
             if err then return callback(err)
 
+            for row in rows
+                # 'content' usually duplicates the data in row._xml
+                delete row.content
+
             file.worksheet.rows = rows
             file.contents = new Buffer(JSON.stringify(file.worksheet, null, '  '))
             callback(null, file)
